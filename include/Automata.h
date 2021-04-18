@@ -1,32 +1,29 @@
-#include <string>
 using namespace std;
-class Automata {
-
+class Automata
+{
 private:
-	enum State
-	{
-		OFF,
-		WAIT,
-		ACCEPT,
-		CHECK,
-		COOK
-	};
-	int cash;
-	int ch;
-	string menu[4] = { "Latte" ,"Cappuccino","Espresso","Americano" };
-	int prices[4] = { 80,100,120,140 };
-	State state;
-	void cook();
-	void check();
+    enum State
+    {
+        OFF,
+        WAIT,
+        ACCEPT,
+        CHECK,
+        COOK
+    };
+    int cash = 0;
+    const char* menu[3] = { "Black coffee","Cappuccino","Caffe latte" };
+    int prices[3] = { 100, 200, 300 };
+    State st = OFF;
+    bool check(int val);
+    void cook(int val);
+    void finish(int val);
 
 public:
-	Automata();
-	void on();
-	void off();
-	int coin(int cash);
-	string* etMenu();
-	State getState();
-	void choice(int ch);
-	int cancel();
-	string finish();
+    void on();
+    State getState() { return st; };
+    int off();
+    void coin(int money);
+    int choice(int val);
+    const char** etMenu();
+    int cancel();
 };
