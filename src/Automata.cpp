@@ -1,87 +1,75 @@
 #include "Automata.h"
+using namespace std;
 
-
-Automata::Automata() {
-	state = OFF;
-	cash = 0;
-	ch = -1;
+bool Automata::check(int val)
+{
+    st = CHECK;
+    bool F = false;
+    if (val <= 3)
+        if (prices[val - 1] <= cash) F = true;
+    return F;
+}
+void Automata::cook(int val)
+{
+    st = COOK;
+    int k = 0;
+    for (int i = 0; i < 10000; i++) k++;//simulated cooking
+    finish(val);
+}
+void Automata::finish(int val)
+{
+    st = WAIT;
+    cash = cash - prices[val - 1];
+    int k = 0;
+    for (int i = 0; i < 10000; i++) k++;//Simulated dispensing of a drink
 }
 void Automata::on()
 {
-	if (state == OFF) {
-		state = WAIT;
-	}
+    if (st == OFF)
+    {
+        st = WAIT;
+    }
 }
-
-void Automata::off() {
-	if (state == WAIT)
-	{
-		state = OFF;
-	}
+int Automata::off()
+{
+    if (st == COOK || st == CHECK)
+    {
+        int k = 0;
+        for (int i = 0; i < 100000; i++) k++;//pause
+    }
+    st = OFF;
+    int change = cash;
+    cash = 0;
+    return change;
 }
-
-int Automata::coin(int cash) {
-	if (state == WAIT || state == ACCEPT)
-	{
-		this->cash += cash;
-		state = ACCEPT;
-		return 0;
-	}
-	else return cash;
+void Automata::coin(int money)
+{
+    if (st != OFF)
+    {
+        cash = cash + money;
+        if (st == WAIT) st = ACCEPT;
+    }
 }
-
-void Automata::choice(int ch) {
-	if (state == ACCEPT)
-	{
-		if (ch <= 4) {
-			this->ch = ch;
-			state = CHECK;
-			check();
-		}
-	}
+int Automata::choice(int val)
+{
+    if (st == ACCEPT)
+    {
+        if (check(val)) cook(val);
+        else return cancel();
+    }
+    return 0;
 }
-
-void Automata::check() {
-	if (state == CHECK) {
-		if (cash - prices[ch] >= 0)
-			cook();
-		else state = ACCEPT;
-	}
+const char** Automata::etMenu()
+{
+    return menu;
 }
-
-int Automata::cancel() {
-	if (state == ACCEPT || state == CHECK || state == WAIT)
-	{
-		state = WAIT;
-		int refund = cash;
-		cash = 0;
-		return refund;
-	}
-	else return 0;
-}
-
-void Automata::cook() {
-	if (state == CHECK) {
-		state = COOK;
-	}
-}
-
-string Automata::finish() {
-	if (state == COOK) {
-		cash -= prices[ch];
-		state = WAIT;
-		string drink = menu[ch];
-		ch = -1;
-		return drink;
-	}
-	return "";
-
-}
-
-string* Automata::etMenu() {
-	return menu;
-}
-
-Automata::State Automata::getState() {
-	return state;
+int Automata::cancel()
+{
+    if (st == ACCEPT || st == CHECK || st == WAIT)
+    {
+        st = WAIT;
+        int change = cash;
+        cash = 0;
+        return change;
+    }
 }
